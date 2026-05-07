@@ -1,7 +1,7 @@
 // src/app/api/v1/products/route.ts
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/utils/response";
-import { ProductStatus } from "@/generated/prisma/client";
+import { Prisma, ProductStatus } from "@/generated/prisma/client";
 
 export async function GET(request: Request) {
   try {
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const search = searchParams.get("search");
     const status = searchParams.get("status") as ProductStatus | null;
 
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       deletedAt: null,
       status: status || ProductStatus.ACTIVE,
     };
