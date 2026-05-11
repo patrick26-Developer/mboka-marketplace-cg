@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { CreateOrderInput } from "../lib/validations/order.validation";
 
 export function useUserOrders(page = 1, limit = 10) {
   return useQuery({
@@ -18,7 +19,7 @@ export function useCreateOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: CreateOrderInput) => {
       const res = await fetch("/api/v1/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

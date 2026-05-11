@@ -9,6 +9,7 @@ export class CartService {
     // Vérifier que le produit existe et est disponible
     const product = await prisma.product.findUnique({
       where: { id: data.productId, deletedAt: null },
+      select: { id: true, price: true, stock: true, shopId: true },
     });
 
     if (!product) {
@@ -53,6 +54,7 @@ export class CartService {
               stock: true,
               thumbnail: true,
               status: true,
+              shopId: true,
             },
           },
         },
@@ -77,6 +79,7 @@ export class CartService {
             stock: true,
             thumbnail: true,
             status: true,
+            shopId: true,
           },
         },
       },
@@ -99,6 +102,7 @@ export class CartService {
             stock: true,
             thumbnail: true,
             status: true,
+            shopId: true,
             shop: {
               select: {
                 id: true,
@@ -156,6 +160,7 @@ export class CartService {
             stock: true,
             thumbnail: true,
             status: true,
+            shopId: true,
           },
         },
       },

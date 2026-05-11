@@ -1,3 +1,4 @@
+// src/hooks/useCart.ts
 "use client";
 
 import { useCartStore } from "@/stores/cart.store";
@@ -15,8 +16,8 @@ export function useCart() {
   const addToCart = useCallback(
     (item: {
       productId: string;
-      productName: string;  // ✅ CORRIGÉ (était name)
-      productImage: string | null;
+      name: string;
+      image: string | null; 
       shopId: string;
       price: number;
       stock: number;
@@ -42,22 +43,22 @@ export function useCart() {
 
       cart.addItem({
         productId: item.productId,
-        productName: item.productName,
-        productImage: item.productImage,
+        productName: item.name,
+        productImage: item.image,
         shopId: item.shopId,
         quantity: 1,
         priceSnapshot: item.price,
         stock: item.stock,
       });
 
-      toast.success(`${item.productName} ajouté au panier ✅`);
+      toast.success(`${item.name} ajouté au panier`);
     },
     [cart, isAuthenticated, router]
   );
 
   return {
     items: cart.items,
-    itemsCount: cart.getTotalItems(),     // ✅ CORRIGÉ
+    itemsCount: cart.getTotalItems(),
     totalFormatted: formatFCFA(cart.getTotalPrice()),
     totalRaw: cart.getTotalPrice(),
     addToCart,

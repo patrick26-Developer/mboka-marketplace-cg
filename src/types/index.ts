@@ -181,7 +181,7 @@ export interface CreateShopDTO {
   phone?: string;
   slug: string;
   adminId: string;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
   metaTitle?: string;
   metaDescription?: string;
 }
@@ -194,7 +194,7 @@ export interface UpdateShopDTO {
   email?: string;
   phone?: string;
   isActive?: boolean;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
   metaTitle?: string;
   metaDescription?: string;
 }

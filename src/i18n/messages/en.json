@@ -1,0 +1,71 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "logout": "Logout",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "shops": "Shops",
+    "orders": "Orders",
+    "products": "Products",
+    "categories": "Categories",
+    "coupons": "Coupons",
+    "stock": "Stock",
+    "logs": "Activity Logs",
+    "reviews": "Customer Reviews",
+    "analytics": "Analytics"
+  },
+  "admin": {
+    "title": "Marketplace CG Administration",
+    "stats": {
+      "totalUsers": "Total Users",
+      "totalShops": "Shops",
+      "totalOrders": "Orders",
+      "totalRevenue": "Total Revenue"
+    },
+    "recentOrders": "Recent Orders",
+    "userManagement": "User Management",
+    "shopManagement": "Shop Management",
+    "createShopAdmin": "Create Shop Admin"
+  },
+  "shop": {
+    "title": "Shop Management",
+    "stats": {
+      "totalProducts": "Total Products",
+      "totalOrders": "Orders",
+      "lowStock": "Low Stock",
+      "monthRevenue": "Month Revenue"
+    },
+    "stockAlerts": "Stock Alerts",
+    "bestSellers": "Best Sellers",
+    "addProduct": "Add Product",
+    "manageOrders": "Manage Orders"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "signInWithGoogle": "Continue with Google",
+    "noAccount": "No account?",
+    "alreadyHaveAccount": "Already have an account?"
+  },
+  "errors": {
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access Denied",
+    "notFound": "Page Not Found",
+    "serverError": "Server Error"
+  }
+}

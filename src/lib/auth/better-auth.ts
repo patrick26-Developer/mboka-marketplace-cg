@@ -50,7 +50,7 @@ export const auth = betterAuth({
       create: {
         after: async (session) => {
           try {
-            // ✅ session est du type de la table session Prisma
+            //session est du type de la table session Prisma
             const userId: string = session.userId as string;
 
             const user = await prisma.user.findUnique({
@@ -67,10 +67,10 @@ export const auth = betterAuth({
 
             if (!user) return;
 
-            // ✅ BLOQUER les admins
+            //BLOQUER les admins
             if (user.role !== UserRole.CUSTOMER) {
               console.warn(
-                `⚠️ [BetterAuth] Admin ${user.email} a tenté Google OAuth - Bloqué`
+                `[BetterAuth] Admin ${user.email} a tenté Google OAuth - Bloqué`
               );
               return;
             }
@@ -85,12 +85,12 @@ export const auth = betterAuth({
             });
 
             console.log(
-              `✅ [BetterAuth] Connexion Google réussie: ${user.email}`
+              `[BetterAuth] Connexion Google réussie: ${user.email}`
             );
           } catch (err: unknown) {
             const message: string =
               err instanceof Error ? err.message : "Erreur inconnue";
-            console.error(`❌ [BetterAuth Hook] Erreur:`, message);
+            console.error(`[BetterAuth Hook] Erreur:`, message);
           }
         },
       },
