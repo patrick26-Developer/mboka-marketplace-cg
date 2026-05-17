@@ -72,6 +72,11 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  */
 export type RefreshToken = Prisma.RefreshTokenModel
 /**
+ * Model Verification
+ * 
+ */
+export type Verification = Prisma.VerificationModel
+/**
  * Model Address
  * 
  */

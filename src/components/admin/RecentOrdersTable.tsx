@@ -1,7 +1,7 @@
 // src/components/admin/RecentOrdersTable.tsx
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslate } from "@/hooks/useTranslate";
 import { formatFCFA } from "@/lib/utils/format";
 import { formatDistanceToNow } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
@@ -54,7 +54,7 @@ const statusColors: Record<OrderStatus, string> = {
 };
 
 export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
-  const t = useTranslations();
+  const {t} = useTranslate();
   const { locale } = useLocale();
 
   return (

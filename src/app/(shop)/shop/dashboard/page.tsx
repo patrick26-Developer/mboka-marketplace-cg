@@ -1,5 +1,5 @@
 // src/app/[locale]/(shop)/shop/dashboard/page.tsx
-import { useTranslations } from "next-intl";
+import { useTranslate } from "@/hooks/useTranslate";
 import { StatsCard } from "@/components/admin/StatsCard";
 import { StockAlert } from "@/components/shop/StockAlert";
 import { BestSellers } from "@/components/shop/BestSellers";
@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function ShopDashboardPage() {
-  const t = useTranslations();
+  const {t} = useTranslate();
   const user = await getCurrentUser();
 
   if (!user) {

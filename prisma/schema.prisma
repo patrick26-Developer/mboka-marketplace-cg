@@ -350,6 +350,24 @@ model RefreshToken {
 }
 
 // ============================================================
+// VERIFICATION (Better Auth)
+// ============================================================
+
+model Verification {
+  id         String   @id @db.Text
+  identifier String   @db.VarChar(255)
+  value      String   @db.VarChar(255)
+  expiresAt  DateTime @db.Timestamptz
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  updatedAt  DateTime @updatedAt @db.Timestamptz
+
+  @@unique([identifier, value])
+  @@index([identifier])
+  @@index([expiresAt])
+  @@map("verification")
+}
+
+// ============================================================
 // MODÈLE ADDRESS
 // ============================================================
 

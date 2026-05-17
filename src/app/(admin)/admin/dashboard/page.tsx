@@ -1,5 +1,5 @@
 // src/app/[locale]/(admin)/admin/dashboard/page.tsx
-import { useTranslations } from "next-intl";
+import { useTranslate } from "@/src/hooks/useTranslate";
 import { StatsCard } from "@/components/admin/StatsCard";
 import { RecentOrdersTable } from "@/components/admin/RecentOrdersTable";
 import { Users, Store, ShoppingCart, DollarSign } from "lucide-react";
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminDashboardPage() {
-  const t = useTranslations();
+  const {t} = useTranslate();
 
   // ✅ VRAIES DONNÉES depuis la DB
   const stats = await AdminService.getGlobalStats();

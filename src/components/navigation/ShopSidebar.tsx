@@ -1,7 +1,6 @@
-// src/components/navigation/ShopSidebar.tsx
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslate, MessageKey } from "@/hooks/useTranslate";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -31,37 +30,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-const menuItems = [
-  {
-    title: "nav.dashboard",
-    icon: LayoutDashboard,
-    href: "/shop/dashboard",
-  },
-  {
-    title: "nav.products",
-    icon: Package,
-    href: "/shop/products",
-  },
-  {
-    title: "nav.orders",
-    icon: ShoppingCart,
-    href: "/shop/orders",
-  },
-  {
-    title: "nav.categories",
-    icon: FolderTree,
-    href: "/shop/categories",
-  },
-  {
-    title: "nav.stock",
-    icon: Package2,
-    href: "/shop/stock",
-  },
-  {
-    title: "nav.coupons",
-    icon: Ticket,
-    href: "/shop/coupons",
-  },
+// ✅ Type strict pour les items de menu
+const menuItems: Array<{
+  title: MessageKey;
+  icon: typeof LayoutDashboard;
+  href: string;
+}> = [
+  { title: "nav.dashboard", icon: LayoutDashboard, href: "/shop/dashboard" },
+  { title: "nav.products", icon: Package, href: "/shop/products" },
+  { title: "nav.orders", icon: ShoppingCart, href: "/shop/orders" },
+  { title: "nav.categories", icon: FolderTree, href: "/shop/categories" },
+  { title: "nav.stock", icon: Package2, href: "/shop/stock" },
+  { title: "nav.coupons", icon: Ticket, href: "/shop/coupons" },
 ];
 
 interface ShopSidebarProps {
@@ -71,23 +51,17 @@ interface ShopSidebarProps {
 }
 
 export function ShopSidebar({ shopName, shopType, lowStockCount = 0 }: ShopSidebarProps) {
-  const t = useTranslations();
+  const { t } = useTranslate();
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
   const getInitials = (name: string | null) => {
     if (!name) return "SA";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
   return (
     <Sidebar className="border-r">
-      {/* Header */}
       <SidebarHeader className="border-b p-4">
         <Link href="/shop/dashboard" className="flex items-center gap-3 group">
           <motion.div
@@ -104,7 +78,6 @@ export function ShopSidebar({ shopName, shopType, lowStockCount = 0 }: ShopSideb
         </Link>
       </SidebarHeader>
 
-      {/* Navigation */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -128,29 +101,16 @@ export function ShopSidebar({ shopName, shopType, lowStockCount = 0 }: ShopSideb
                         asChild
                         className={cn(
                           "group relative transition-colors duration-200",
-                          isActive
-                            ? "bg-primary/10 text-primary hover:bg-primary/15"
-                            : "hover:bg-accent/50"
+                          isActive ? "bg-primary/10 text-primary hover:bg-primary/15" : "hover:bg-accent/50"
                         )}
                       >
                         <Link href={item.href}>
-                          <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ type: "spring", stiffness: 400 }}
-                          >
-                            <Icon
-                              className={cn(
-                                "h-4 w-4 transition-colors duration-200",
-                                isActive ? "text-primary" : "text-muted-foreground"
-                              )}
-                            />
+                          <motion.div whileHover={{ scale: 1.1 }} transition={{ type: "spring", stiffness: 400 }}>
+                            <Icon className={cn("h-4 w-4 transition-colors duration-200", isActive ? "text-primary" : "text-muted-foreground")} />
                           </motion.div>
                           <span className="font-medium">{t(item.title)}</span>
                           {showBadge && (
-                            <Badge
-                              variant="destructive"
-                              className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs"
-                            >
+                            <Badge variant="destructive" className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs">
                               {lowStockCount}
                             </Badge>
                           )}
@@ -172,7 +132,6 @@ export function ShopSidebar({ shopName, shopType, lowStockCount = 0 }: ShopSideb
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer */}
       <SidebarFooter className="border-t p-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">

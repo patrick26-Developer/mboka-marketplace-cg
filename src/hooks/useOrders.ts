@@ -8,7 +8,7 @@ export function useUserOrders(page = 1, limit = 10) {
   return useQuery({
     queryKey: ["orders", "user", page],
     queryFn: async () => {
-      const res = await fetch(`/api/v1/orders?page=${page}&limit=${limit}`);
+      const res = await fetch(`/api/orders?page=${page}&limit=${limit}`);
       if (!res.ok) throw new Error("Erreur chargement commandes");
       return res.json();
     },
@@ -20,7 +20,7 @@ export function useCreateOrder() {
 
   return useMutation({
     mutationFn: async (data: CreateOrderInput) => {
-      const res = await fetch("/api/v1/orders", {
+      const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

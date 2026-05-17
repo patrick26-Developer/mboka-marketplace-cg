@@ -1,14 +1,9 @@
-// src/lib/auth/better-auth.ts
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { prisma } from "@/lib/prisma";
 import { logActivity } from "@/lib/utils/activity";
-import {
-  ActivityAction,
-  UserRole,
-  OAuthProvider,
-} from "@/generated/prisma/client";
+import { ActivityAction, UserRole } from "@/generated/prisma/client";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -20,10 +15,15 @@ export const auth = betterAuth({
 
   plugins: [nextCookies()],
 
+  // ============================================================
+  // ❌ IMPORTANT : désactiver les modules non utilisés
+  // ============================================================
   emailAndPassword: {
     enabled: false,
   },
-
+  // ============================================================
+  // GOOGLE OAUTH
+  // ============================================================
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -38,19 +38,18 @@ export const auth = betterAuth({
   },
 
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/login?error=google_failed",
+    signIn: "/fr/auth/login",
+    error: "/fr/auth/login?error=google_failed",
   },
 
   // ============================================================
-  // HOOK - Utilise le type réel de la table session Prisma
+  // HOOKS (OK - on garde ton logique métier)
   // ============================================================
   databaseHooks: {
     session: {
       create: {
         after: async (session) => {
           try {
-            //session est du type de la table session Prisma
             const userId: string = session.userId as string;
 
             const user = await prisma.user.findUnique({
@@ -67,7 +66,7 @@ export const auth = betterAuth({
 
             if (!user) return;
 
-            //BLOQUER les admins
+            // ⚠️ Tu bloques les admins côté business (OK)
             if (user.role !== UserRole.CUSTOMER) {
               console.warn(
                 `[BetterAuth] Admin ${user.email} a tenté Google OAuth - Bloqué`
@@ -75,21 +74,24 @@ export const auth = betterAuth({
               return;
             }
 
-            // Logger l'activité
             await logActivity({
               userId: user.id,
               action: ActivityAction.LOGIN_SUCCESS,
               entity: "User",
               entityId: user.id,
-              metadata: { provider: "GOOGLE", email: user.email },
+              metadata: {
+                provider: "GOOGLE",
+                email: user.email,
+              },
             });
 
             console.log(
               `[BetterAuth] Connexion Google réussie: ${user.email}`
             );
           } catch (err: unknown) {
-            const message: string =
+            const message =
               err instanceof Error ? err.message : "Erreur inconnue";
+
             console.error(`[BetterAuth Hook] Erreur:`, message);
           }
         },

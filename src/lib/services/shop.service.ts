@@ -1,6 +1,6 @@
 // src/lib/services/shop.service.ts
 import { prisma } from "@/lib/prisma";
-import { PaymentStatus, ProductStatus } from "@/generated/prisma/client";
+import { PaymentStatus, ProductStatus, ShopType } from "@/generated/prisma/client";
 
 export class ShopService {
   /**
@@ -263,4 +263,191 @@ export class ShopService {
       .map(([month, revenue]) => ({ month, revenue }))
       .reverse();
   }
+
+/**
+ * Lister toutes les boutiques (Admin)
+ */
+static async listAllShops(page = 1, limit = 20) {
+  const [shops, total] = await Promise.all([
+    prisma.shop.findMany({
+      where: { deletedAt: null },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        slug: true,
+        logo: true,
+        banner: true,
+        email: true,
+        phone: true,
+        isActive: true,
+        createdAt: true,
+        admin: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        _count: {
+          select: {
+            products: true,
+            orders: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.shop.count({ where: { deletedAt: null } }),
+  ]);
+
+  return {
+    shops,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    },
+  };
+}
+
+/**
+ * Créer une boutique (Super Admin)
+ */
+static async createShop(data: {
+  name: string;
+  type: ShopType;
+  slug: string;
+  adminId: string;
+  description?: string;
+  logo?: string;
+  banner?: string;
+  email?: string;
+  phone?: string;
+}) {
+  // Vérifier que le Shop Admin existe et a le bon rôle
+  const admin = await prisma.user.findUnique({
+    where: { id: data.adminId },
+    select: { role: true, shops: { select: { id: true } } },
+  });
+
+  if (!admin) {
+    throw new Error("Utilisateur introuvable");
+  }
+
+  if (admin.role !== "SHOP_ADMIN") {
+    throw new Error("L'utilisateur doit avoir le rôle SHOP_ADMIN");
+  }
+
+  if (admin.shops.length > 0) {
+    throw new Error("Ce Shop Admin gère déjà une boutique");
+  }
+
+  // Vérifier que le type n'est pas déjà pris
+  const existingShop = await prisma.shop.findFirst({
+    where: { type: data.type, deletedAt: null },
+  });
+
+  if (existingShop) {
+    throw new Error(`Une boutique ${data.type} existe déjà`);
+  }
+
+  return prisma.shop.create({
+    data: {
+      name: data.name,
+      type: data.type,
+      slug: data.slug,
+      adminId: data.adminId,
+      description: data.description,
+      logo: data.logo,
+      banner: data.banner,
+      email: data.email,
+      phone: data.phone,
+      isActive: true,
+    },
+    include: {
+      admin: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Mettre à jour une boutique
+ */
+static async updateShop(
+  shopId: string,
+  data: {
+    name?: string;
+    description?: string;
+    logo?: string;
+    banner?: string;
+    email?: string;
+    phone?: string;
+    isActive?: boolean;
+  }
+) {
+  return prisma.shop.update({
+    where: { id: shopId },
+    data,
+    include: {
+      admin: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Supprimer une boutique (soft delete)
+ */
+static async deleteShop(shopId: string) {
+  return prisma.shop.update({
+    where: { id: shopId },
+    data: {
+      deletedAt: new Date(),
+      isActive: false,
+    },
+  });
+}
+
+/**
+ * Récupérer une boutique par ID
+ */
+static async getShopById(shopId: string) {
+  return prisma.shop.findUnique({
+    where: { id: shopId },
+    include: {
+      admin: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+        },
+      },
+      _count: {
+        select: {
+          products: true,
+          orders: true,
+          categories: true,
+        },
+      },
+    },
+  });
+}
 }

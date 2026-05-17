@@ -6,7 +6,7 @@ export function useNotifications(page = 1) {
   return useQuery({
     queryKey: ["notifications", page],
     queryFn: async () => {
-      const res = await fetch(`/api/v1/notifications?page=${page}`);
+      const res = await fetch(`/api/notifications?page=${page}`);
       if (!res.ok) throw new Error("Erreur notifications");
       return res.json();
     },
@@ -19,7 +19,7 @@ export function useMarkAsRead() {
 
   return useMutation({
     mutationFn: async (notificationId: string) => {
-      const res = await fetch(`/api/v1/notifications/${notificationId}/read`, {
+      const res = await fetch(`/api/notifications/${notificationId}/read`, {
         method: "POST",
       });
       if (!res.ok) throw new Error("Erreur");

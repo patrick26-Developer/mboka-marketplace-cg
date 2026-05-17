@@ -15,7 +15,7 @@ export function useProducts(filters?: ProductFilters, page = 1, limit = 20) {
         ...(filters?.search && { search: filters.search }),
       });
 
-      const res = await fetch(`/api/v1/products?${params}`);
+      const res = await fetch(`/api/products?${params}`);
       if (!res.ok) throw new Error("Erreur chargement produits");
       return res.json();
     },
@@ -26,7 +26,7 @@ export function useProduct(slug: string) {
   return useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
-      const res = await fetch(`/api/v1/products/${slug}`);
+      const res = await fetch(`/api/products/${slug}`);
       if (!res.ok) throw new Error("Produit introuvable");
       return res.json();
     },

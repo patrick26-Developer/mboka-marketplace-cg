@@ -10,7 +10,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function loadUser() {
       try {
-        const res = await fetch("/api/v1/auth/me");
+        const res = await fetch("/api/auth/me");
         if (res.ok) {
           const data = await res.json();
           setUser(data.data);
