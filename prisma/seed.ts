@@ -30,7 +30,8 @@ async function main() {
   await prisma.passwordResetToken.deleteMany();
   await prisma.refreshToken.deleteMany();
   await prisma.session.deleteMany();
-  await prisma.oAuthAccount.deleteMany();
+  await prisma.account.deleteMany(); // ✅ CORRIGÉ : account au lieu de oAuthAccount
+  await prisma.verification.deleteMany(); // ✅ AJOUTÉ : table Better Auth
   await prisma.user.deleteMany();
 
   console.log("Database cleaned");

@@ -1,10 +1,11 @@
 // src/lib/auth/session.ts
-import { prisma }      from "@/lib/prisma";
-import { cookies }     from "next/headers";
+import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 import { verifyAccessToken, type AccessTokenPayload } from "./jwt";
-import type { Prisma } from "@/generated/prisma/client"; // ✅ import Prisma types
+import type { Prisma } from "@/generated/prisma/client";
+import crypto from "crypto";
 
-export const COOKIE_ACCESS_TOKEN  = "mcg_access_token";
+export const COOKIE_ACCESS_TOKEN = "mcg_access_token";
 export const COOKIE_REFRESH_TOKEN = "mcg_refresh_token";
 
 // ============================================================
@@ -12,16 +13,17 @@ export const COOKIE_REFRESH_TOKEN = "mcg_refresh_token";
 // ============================================================
 
 export async function createSession(params: {
-  userId:     string;
-  token:      string;
-  expiresAt:  Date;
+  userId: string;
+  token: string;
+  expiresAt: Date;
   ipAddress?: string | null;
   userAgent?: string | null;
 }): Promise<string> {
   const session = await prisma.session.create({
     data: {
-      userId:    params.userId,
-      token:     params.token,
+      id: crypto.randomUUID(), // ✅ AJOUTÉ : ID généré manuellement
+      userId: params.userId,
+      token: params.token,
       expiresAt: params.expiresAt,
       ipAddress: params.ipAddress ?? null,
       userAgent: params.userAgent ?? null,
@@ -36,17 +38,16 @@ export async function createSession(params: {
 // ============================================================
 
 export async function createRefreshTokenRecord(params: {
-  userId:      string;
-  token:       string;
-  expiresAt:   Date;
-  deviceInfo?: Prisma.InputJsonValue | null; // ✅ Type Prisma correct pour JsonB
+  userId: string;
+  token: string;
+  expiresAt: Date;
+  deviceInfo?: Prisma.InputJsonValue | null;
 }): Promise<string> {
   const record = await prisma.refreshToken.create({
     data: {
-      userId:     params.userId,
-      token:      params.token,
-      expiresAt:  params.expiresAt,
-      // ✅ Prisma accepte undefined pour omettre le champ
+      userId: params.userId,
+      token: params.token,
+      expiresAt: params.expiresAt,
       ...(params.deviceInfo !== null && params.deviceInfo !== undefined
         ? { deviceInfo: params.deviceInfo }
         : {}),
@@ -57,13 +58,13 @@ export async function createRefreshTokenRecord(params: {
 }
 
 // ============================================================
-// RÉVOQUER SESSION
+// RÉVOQUER SESSION (Better Auth n'a pas de champ isRevoked)
 // ============================================================
 
 export async function revokeSession(sessionId: string): Promise<void> {
-  await prisma.session.update({
+  // ✅ Better Auth : on SUPPRIME la session au lieu de la marquer comme révoquée
+  await prisma.session.delete({
     where: { id: sessionId },
-    data:  { isRevoked: true, revokedAt: new Date() },
   });
 }
 
@@ -74,7 +75,7 @@ export async function revokeSession(sessionId: string): Promise<void> {
 export async function revokeRefreshToken(tokenId: string): Promise<void> {
   await prisma.refreshToken.update({
     where: { id: tokenId },
-    data:  { isRevoked: true, revokedAt: new Date() },
+    data: { isRevoked: true, revokedAt: new Date() },
   });
 }
 
@@ -85,13 +86,14 @@ export async function revokeRefreshToken(tokenId: string): Promise<void> {
 export async function revokeAllUserSessions(userId: string): Promise<void> {
   const now = new Date();
   await Promise.all([
-    prisma.session.updateMany({
-      where: { userId, isRevoked: false },
-      data:  { isRevoked: true, revokedAt: now },
+    // ✅ Better Auth : SUPPRIMER toutes les sessions
+    prisma.session.deleteMany({
+      where: { userId },
     }),
+    // ✅ Vos refresh tokens : marquer comme révoqués
     prisma.refreshToken.updateMany({
       where: { userId, isRevoked: false },
-      data:  { isRevoked: true, revokedAt: now },
+      data: { isRevoked: true, revokedAt: now },
     }),
   ]);
 }
@@ -103,15 +105,15 @@ export async function revokeAllUserSessions(userId: string): Promise<void> {
 export async function getCurrentUser(): Promise<AccessTokenPayload | null> {
   try {
     const cookieStore = await cookies();
-    const token       = cookieStore.get(COOKIE_ACCESS_TOKEN)?.value;
+    const token = cookieStore.get(COOKIE_ACCESS_TOKEN)?.value;
     if (!token) return null;
 
     const payload = await verifyAccessToken(token);
 
+    // ✅ Vérifier si session existe et n'est pas expirée
     const session = await prisma.session.findFirst({
       where: {
         token,
-        isRevoked: false,
         expiresAt: { gt: new Date() },
       },
       select: { id: true },
@@ -129,27 +131,27 @@ export async function getCurrentUser(): Promise<AccessTokenPayload | null> {
 // ============================================================
 
 export async function setAuthCookies(params: {
-  accessToken:           string;
-  refreshToken:          string;
-  accessTokenExpiresAt:  Date;
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAt: Date;
   refreshTokenExpiresAt: Date;
 }): Promise<void> {
   const cookieStore = await cookies();
 
   cookieStore.set(COOKIE_ACCESS_TOKEN, params.accessToken, {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    path:     "/",
-    expires:  params.accessTokenExpiresAt,
+    path: "/",
+    expires: params.accessTokenExpiresAt,
   });
 
   cookieStore.set(COOKIE_REFRESH_TOKEN, params.refreshToken, {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    path:     "/api/auth/refresh",
-    expires:  params.refreshTokenExpiresAt,
+    path: "/api/auth/refresh",
+    expires: params.refreshTokenExpiresAt,
   });
 }
 

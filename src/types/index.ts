@@ -14,7 +14,6 @@ import {
   DiscountType,
   ActivityAction,
   AddressType,
-  OAuthProvider,
   StockMovementType,
 } from "@/generated/prisma/client";
 

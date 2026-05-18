@@ -47,15 +47,20 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
- * Model OAuthAccount
+ * Model Account
  * 
  */
-export type OAuthAccount = Prisma.OAuthAccountModel
+export type Account = Prisma.AccountModel
 /**
  * Model Session
  * 
  */
 export type Session = Prisma.SessionModel
+/**
+ * Model Verification
+ * 
+ */
+export type Verification = Prisma.VerificationModel
 /**
  * Model EmailVerificationToken
  * 
@@ -71,11 +76,6 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  * 
  */
 export type RefreshToken = Prisma.RefreshTokenModel
-/**
- * Model Verification
- * 
- */
-export type Verification = Prisma.VerificationModel
 /**
  * Model Address
  * 

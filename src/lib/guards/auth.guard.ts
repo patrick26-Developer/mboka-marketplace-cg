@@ -44,7 +44,6 @@ export async function authenticate(
     const session = await prisma.session.findFirst({
       where: {
         token,
-        isRevoked: false,
         expiresAt: { gt: new Date() },
       },
       select: {

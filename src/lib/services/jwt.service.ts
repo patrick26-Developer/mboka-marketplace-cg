@@ -6,8 +6,8 @@ import crypto from "crypto";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 const JWT_REFRESH_SECRET = new TextEncoder().encode(process.env.JWT_REFRESH_SECRET!);
 
-const ACCESS_TOKEN_EXPIRY = "15m"; // 15 minutes
-const REFRESH_TOKEN_EXPIRY = "30d"; // 30 jours
+const ACCESS_TOKEN_EXPIRY = "15m";
+const REFRESH_TOKEN_EXPIRY = "30d";
 
 export class JWTService {
   // ============================================================
@@ -31,7 +31,7 @@ export class JWTService {
     const token = crypto.randomBytes(64).toString("hex");
 
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30); // 30 jours
+    expiresAt.setDate(expiresAt.getDate() + 30);
 
     await prisma.refreshToken.create({
       data: {
@@ -91,20 +91,18 @@ export class JWTService {
   // REVOKE ALL USER TOKENS
   // ============================================================
   static async revokeAllUserTokens(userId: string): Promise<void> {
+    // ✅ RefreshToken garde isRevoked
     await prisma.refreshToken.updateMany({
-      where: { userId, isRevoked: false },
+      where: { userId },
       data: {
         isRevoked: true,
         revokedAt: new Date(),
       },
     });
 
-    await prisma.session.updateMany({
-      where: { userId, isRevoked: false },
-      data: {
-        isRevoked: true,
-        revokedAt: new Date(),
-      },
+    // ✅ Session n'a plus isRevoked — on supprime directement
+    await prisma.session.deleteMany({
+      where: { userId },
     });
   }
 
@@ -116,12 +114,14 @@ export class JWTService {
     ipAddress?: string,
     userAgent?: string
   ): Promise<string> {
+    const sessionId = crypto.randomUUID();
     const sessionToken = crypto.randomBytes(64).toString("hex");
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
     const session = await prisma.session.create({
       data: {
+        id: sessionId,
         userId,
         token: sessionToken,
         expiresAt,
@@ -139,10 +139,10 @@ export class JWTService {
   static async verifySession(sessionId: string): Promise<boolean> {
     const session = await prisma.session.findUnique({
       where: { id: sessionId },
-      select: { expiresAt: true, isRevoked: true },
+      select: { expiresAt: true }, // ✅ isRevoked supprimé du modèle Session
     });
 
-    if (!session || session.isRevoked || session.expiresAt < new Date()) {
+    if (!session || session.expiresAt < new Date()) {
       return false;
     }
 

@@ -140,12 +140,3 @@ export const AddressType = {
 } as const
 
 export type AddressType = (typeof AddressType)[keyof typeof AddressType]
-
-
-export const OAuthProvider = {
-  GOOGLE: 'GOOGLE',
-  FACEBOOK: 'FACEBOOK',
-  APPLE: 'APPLE'
-} as const
-
-export type OAuthProvider = (typeof OAuthProvider)[keyof typeof OAuthProvider]

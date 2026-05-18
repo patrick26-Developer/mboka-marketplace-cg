@@ -9,12 +9,12 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
-export type * from './models/OAuthAccount'
+export type * from './models/Account'
 export type * from './models/Session'
+export type * from './models/Verification'
 export type * from './models/EmailVerificationToken'
 export type * from './models/PasswordResetToken'
 export type * from './models/RefreshToken'
-export type * from './models/Verification'
 export type * from './models/Address'
 export type * from './models/Shop'
 export type * from './models/Category'
